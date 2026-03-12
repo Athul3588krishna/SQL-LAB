@@ -1,0 +1,47 @@
+CREATE TABLE account(
+    account_id INT PRIMARY KEY,
+    name VARCHAR(50),
+    balance INT
+);
+
+INSERT INTO account VALUES(101,'Arun',5000);
+INSERT INTO account VALUES(102,'Rahul',2000);
+INSERT INTO account VALUES(103,'Meera',1200);
+
+DELIMITER //
+
+CREATE PROCEDURE withdraw_amount(
+    IN acc_id INT,
+    IN amount INT
+)
+
+BEGIN
+
+DECLARE bal INT;
+
+SELECT balance INTO bal
+FROM account
+WHERE account_id = acc_id;
+
+IF bal IS NULL THEN
+    SELECT 'Account does not exist' AS Message;
+
+ELSEIF (bal - amount) >= 1000 THEN
+    UPDATE account
+    SET balance = balance - amount
+    WHERE account_id = acc_id;
+
+    SELECT 'Withdrawal Successful' AS Message;
+
+ELSE
+    SELECT 'Minimum balance of 1000 must be maintained' AS Message;
+
+END IF;
+
+END //
+
+DELIMITER ;
+
+
+
+CALL withdraw_amount(101,2000);

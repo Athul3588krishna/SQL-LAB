@@ -1,0 +1,49 @@
+6  
+
+Procedure to Calculate Electricity Bill
+Step 1: Create Table
+CREATE TABLE bill(
+customer_id INT,
+name VARCHAR(50),
+pre_reading INT,
+cur_reading INT,
+unit INT,
+amount FLOAT
+);
+
+
+
+
+tep 2: Procedure
+DELIMITER //
+
+CREATE PROCEDURE electricity_bill()
+
+BEGIN
+
+UPDATE bill
+SET unit = cur_reading - pre_reading;
+
+UPDATE bill
+SET amount =
+CASE
+
+WHEN unit <= 100
+THEN unit * 2
+
+WHEN unit BETWEEN 101 AND 200
+THEN unit * 2.5
+
+WHEN unit BETWEEN 201 AND 300
+THEN unit * 3
+
+ELSE unit * 4
+
+END;
+
+END //
+
+DELIMITER ;
+Execute
+CALL electricity_bill();
+

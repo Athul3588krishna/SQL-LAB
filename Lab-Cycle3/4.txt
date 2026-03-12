@@ -1,0 +1,32 @@
+Function to Count Employees with Same Name
+Step 1: Create Employee Table
+CREATE TABLE employee(
+emp_id INT PRIMARY KEY,
+emp_name VARCHAR(50),
+department VARCHAR(50)
+);
+Step 2: Insert Sample Data
+INSERT INTO employee VALUES(1,'Arun','IT');
+INSERT INTO employee VALUES(2,'Rahul','HR');
+INSERT INTO employee VALUES(3,'Arun','Finance');
+Step 3: Create Function
+DELIMITER //
+
+CREATE FUNCTION count_employee(e_name VARCHAR(50))
+RETURNS INT
+DETERMINISTIC
+BEGIN
+
+DECLARE total INT;
+
+SELECT COUNT(*) INTO total
+FROM employee
+WHERE emp_name = e_name;
+
+RETURN total;
+
+END //
+
+DELIMITER ;
+Step 4: Program Logic
+SELECT count_employee('Arun');
