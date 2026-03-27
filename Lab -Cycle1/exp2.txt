@@ -1,0 +1,63 @@
+CREATE TABLE Persons (
+    PersonID INT PRIMARY KEY,
+    Name VARCHAR(50) NOT NULL,
+    Aadhar BIGINT NOT NULL UNIQUE,
+    Age INT CHECK (Age > 18)
+);
+
+
+
+CREATE TABLE Orders (
+    OrderID INT PRIMARY KEY,
+    OrderNumber INT NOT NULL,
+    PersonID INT,
+    FOREIGN KEY (PersonID) REFERENCES Persons(PersonID)
+);
+
+
+DESCRIBE Persons;
+
+
+
+DESCRIBE Orders;
+
+
+CREATE TABLE Department (
+    dept_no INT,
+    dept_name VARCHAR(50)
+);
+
+CREATE TABLE Employee (
+    emp_no INT,
+    emp_name VARCHAR(50)
+);
+
+ALTER TABLE Employee
+ADD PRIMARY KEY (emp_no);
+
+
+
+
+
+ALTER TABLE Department
+ADD PRIMARY KEY (dept_no);
+
+
+
+
+
+ALTER TABLE Employee
+ADD dept_no INT;
+
+ALTER TABLE Employee
+ADD FOREIGN KEY (dept_no)
+REFERENCES Department(dept_no)
+ON DELETE CASCADE;
+
+
+
+
+
+
+ALTER TABLE Orders
+DROP PRIMARY KEY;
