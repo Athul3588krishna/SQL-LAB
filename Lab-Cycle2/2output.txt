@@ -1,0 +1,437 @@
+
+
+```sql
+mysql> CREATE DATABASE labdb;
+Query OK, 1 row affected (0.01 sec)
+
+mysql> USE labdb;
+Database changed
+```
+
+
+```sql
+mysql> CREATE TABLE regions (
+    -> region_id INT PRIMARY KEY,
+    -> region_name VARCHAR(50) NOT NULL
+    -> );
+Query OK, 0 rows affected (0.05 sec)
+
+mysql> CREATE TABLE countries (
+    -> country_id VARCHAR(5) PRIMARY KEY,
+    -> country_name VARCHAR(50) NOT NULL,
+    -> region_id INT,
+    -> FOREIGN KEY (region_id) REFERENCES regions(region_id)
+    -> );
+Query OK, 0 rows affected (0.04 sec)
+
+mysql> CREATE TABLE locations (
+    -> location_id INT PRIMARY KEY,
+    -> street_address VARCHAR(100),
+    -> postal_code VARCHAR(20),
+    -> city VARCHAR(50),
+    -> state_province VARCHAR(50),
+    -> country_id VARCHAR(5),
+    -> FOREIGN KEY (country_id) REFERENCES countries(country_id)
+    -> );
+Query OK, 0 rows affected (0.05 sec)
+
+mysql> CREATE TABLE departments (
+    -> dept_id INT PRIMARY KEY,
+    -> dept_name VARCHAR(50),
+    -> location_id INT,
+    -> FOREIGN KEY (location_id) REFERENCES locations(location_id)
+    -> );
+Query OK, 0 rows affected (0.04 sec)
+
+mysql> CREATE TABLE jobs (
+    -> job_id VARCHAR(10) PRIMARY KEY,
+    -> job_title VARCHAR(50),
+    -> min_salary DECIMAL(10,2),
+    -> max_salary DECIMAL(10,2)
+    -> );
+Query OK, 0 rows affected (0.03 sec)
+
+mysql> CREATE TABLE employees (
+    -> employee_id INT PRIMARY KEY,
+    -> first_name VARCHAR(50),
+    -> last_name VARCHAR(50),
+    -> email VARCHAR(100),
+    -> phone_no VARCHAR(20),
+    -> hire_date DATE,
+    -> job_id VARCHAR(10),
+    -> salary DECIMAL(10,2),
+    -> manager_id INT,
+    -> dept_id INT,
+    -> FOREIGN KEY (job_id) REFERENCES jobs(job_id),
+    -> FOREIGN KEY (manager_id) REFERENCES employees(employee_id),
+    -> FOREIGN KEY (dept_id) REFERENCES departments(dept_id)
+    -> );
+Query OK, 0 rows affected (0.06 sec)
+
+mysql> CREATE TABLE dependents (
+    -> dependent_id INT PRIMARY KEY,
+    -> first_name VARCHAR(50),
+    -> last_name VARCHAR(50),
+    -> relationship VARCHAR(30),
+    -> employee_id INT,
+    -> FOREIGN KEY (employee_id) REFERENCES employees(employee_id)
+    -> );
+Query OK, 0 rows affected (0.04 sec)
+```
+
+---
+
+# INSERT VALUES
+
+```sql
+mysql> INSERT INTO regions VALUES
+    -> (1, 'Asia'),
+    -> (2, 'Europe');
+Query OK, 2 rows affected (0.02 sec)
+
+mysql> INSERT INTO countries VALUES
+    -> ('IN', 'India', 1),
+    -> ('UK', 'United Kingdom', 2);
+Query OK, 2 rows affected (0.02 sec)
+
+mysql> INSERT INTO locations VALUES
+    -> (1700, 'MG Road', '56001', 'Kochi', 'Kerala', 'IN'),
+    -> (1800, 'Oxford St', 'OX80', 'London', 'London', 'UK');
+Query OK, 2 rows affected (0.02 sec)
+
+mysql> INSERT INTO departments VALUES
+    -> (1, 'IT', 1700),
+    -> (2, 'HR', 1700),
+    -> (3, 'Finance', 1800),
+    -> (4, 'Marketing', 1800);
+Query OK, 4 rows affected (0.02 sec)
+
+mysql> INSERT INTO jobs VALUES
+    -> ('IT_PROG', 'Programmer', 5000, 20000),
+    -> ('HR_REP', 'HR Representative', 4000, 15000),
+    -> ('FIN_ACC', 'Accountant', 6000, 18000),
+    -> ('MARK_MAN', 'Marketing Manager', 8000, 25000);
+Query OK, 4 rows affected (0.02 sec)
+
+mysql> INSERT INTO employees VALUES
+    -> (101, 'Rahul', 'Krishna', 'rahul@gmail.com', '9999',
+    -> '2022-01-10', 'IT_PROG', 15000, NULL, 1),
+    -> (102, 'Vivek', 'Kumar', 'vivek@gmail.com', '9998',
+    -> '2022-08-10', 'HR_REP', 9000, 101, 2),
+    -> (103, 'Adhai', 'Kumar', 'adhai@gmail.com', '8844',
+    -> '2021-07-10', 'FIN_ACC', 8000, 101, 3);
+Query OK, 3 rows affected (0.03 sec)
+
+mysql> INSERT INTO dependents VALUES
+    -> (1, 'Anu', 'Sharma', 'Daughter', 101),
+    -> (2, 'Sara', 'Khan', 'Wife', 102);
+Query OK, 2 rows affected (0.02 sec)
+```
+
+---
+
+# QUERIES 1–28
+
+## 1. Employees in location 1700
+
+```sql
+mysql> SELECT *
+    -> FROM employees
+    -> WHERE dept_id IN (
+    -> SELECT dept_id
+    -> FROM departments
+    -> WHERE location_id = 1700
+    -> );
+```
+
+## 2. Employees NOT in location 1700
+
+```sql
+mysql> SELECT *
+    -> FROM employees
+    -> WHERE dept_id NOT IN (
+    -> SELECT dept_id
+    -> FROM departments
+    -> WHERE location_id = 1700
+    -> );
+```
+
+## 3. Employees with highest salary
+
+```sql
+mysql> SELECT *
+    -> FROM employees
+    -> WHERE salary = (
+    -> SELECT MAX(salary)
+    -> FROM employees
+    -> );
+```
+
+## 4. Salary greater than average salary
+
+```sql
+mysql> SELECT *
+    -> FROM employees
+    -> WHERE salary > (
+    -> SELECT AVG(salary)
+    -> FROM employees
+    -> );
+```
+
+## 5. Departments having employee salary > 10000
+
+```sql
+mysql> SELECT dept_id, dept_name
+    -> FROM departments
+    -> WHERE dept_id IN (
+    -> SELECT dept_id
+    -> FROM employees
+    -> WHERE salary > 10000
+    -> );
+```
+
+## 6. Departments having NO employee salary > 10000
+
+```sql
+mysql> SELECT dept_id, dept_name
+    -> FROM departments
+    -> WHERE dept_id NOT IN (
+    -> SELECT dept_id
+    -> FROM employees
+    -> WHERE salary > 10000
+    -> );
+```
+
+## 7. Salary greater than lowest salary of every department
+
+```sql
+mysql> SELECT *
+    -> FROM employees
+    -> WHERE salary > ALL (
+    -> SELECT MIN(salary)
+    -> FROM employees
+    -> GROUP BY dept_id
+    -> );
+```
+
+## 8. Salary greater than highest salary of every department
+
+```sql
+mysql> SELECT *
+    -> FROM employees
+    -> WHERE salary >= ALL (
+    -> SELECT MAX(salary)
+    -> FROM employees
+    -> GROUP BY dept_id
+    -> );
+```
+
+## 9. Average of department averages
+
+```sql
+mysql> SELECT AVG(avg_salary)
+    -> FROM (
+    -> SELECT AVG(salary) AS avg_salary
+    -> FROM employees
+    -> GROUP BY dept_id
+    -> ) AS dept_avg;
+```
+
+## 10. Salary, overall average and difference
+
+```sql
+mysql> SELECT salary,
+    -> (SELECT AVG(salary) FROM employees) AS avg_salary,
+    -> salary - (SELECT AVG(salary) FROM employees) AS difference
+    -> FROM employees;
+```
+
+## 11. Salary greater than department average
+
+```sql
+mysql> SELECT *
+    -> FROM employees e
+    -> WHERE salary > (
+    -> SELECT AVG(salary)
+    -> FROM employees
+    -> WHERE dept_id = e.dept_id
+    -> );
+```
+
+## 12. Employees with NO dependents
+
+```sql
+mysql> SELECT *
+    -> FROM employees
+    -> WHERE employee_id NOT IN (
+    -> SELECT employee_id
+    -> FROM dependents
+    -> );
+```
+
+## 13. Employees in department 1,2,3
+
+```sql
+mysql> SELECT first_name, last_name
+    -> FROM employees
+    -> WHERE dept_id IN (1,2,3);
+```
+
+## 14. Dept 1,2,3 AND salary > 10000
+
+```sql
+mysql> SELECT first_name, last_name, salary
+    -> FROM employees
+    -> WHERE dept_id IN (1,2,3)
+    -> AND salary > 10000;
+```
+
+## 15. Department details
+
+```sql
+mysql> SELECT dept_name
+    -> FROM departments;
+```
+
+## 16. Employees with department name (JOIN)
+
+```sql
+mysql> SELECT e.first_name,
+    -> e.last_name,
+    -> e.dept_id,
+    -> d.dept_name
+    -> FROM employees e
+    -> JOIN departments d
+    -> ON e.dept_id = d.dept_id;
+```
+
+## 17. First name contains 'z'
+
+```sql
+mysql> SELECT first_name, last_name, dept_id
+    -> FROM employees
+    -> WHERE first_name LIKE '%z%';
+```
+
+## 18. All departments including those without employees
+
+```sql
+mysql> SELECT d.dept_id,
+    -> d.dept_name,
+    -> e.first_name
+    -> FROM departments d
+    -> LEFT JOIN employees e
+    -> ON d.dept_id = e.dept_id;
+```
+
+## 19. Employees and their managers
+
+```sql
+mysql> SELECT e.first_name AS employee_name,
+    -> m.first_name AS manager_name
+    -> FROM employees e
+    -> LEFT JOIN employees m
+    -> ON e.manager_id = m.employee_id;
+```
+
+## 20. Employees in same department as Taylor
+
+```sql
+mysql> SELECT first_name, last_name, dept_id
+    -> FROM employees
+    -> WHERE dept_id = (
+    -> SELECT dept_id
+    -> FROM employees
+    -> WHERE last_name = 'Taylor'
+    -> );
+```
+
+## 21. Difference between job max salary and employee salary
+
+```sql
+mysql> SELECT j.job_title,
+    -> e.first_name,
+    -> (j.max_salary - e.salary) AS salary_difference
+    -> FROM employees e
+    -> JOIN jobs j
+    -> ON e.job_id = j.job_id;
+```
+
+## 22. Department average salary and employee count
+
+```sql
+mysql> SELECT d.dept_name,
+    -> AVG(e.salary) AS avg_salary,
+    -> COUNT(e.employee_id) AS employee_count
+    -> FROM departments d
+    -> LEFT JOIN employees e
+    -> ON d.dept_id = e.dept_id
+    -> GROUP BY d.dept_name;
+```
+
+## 23. Create View
+
+```sql
+mysql> CREATE VIEW emp_view AS
+    -> SELECT e.first_name,
+    -> e.employee_id,
+    -> d.dept_name,
+    -> l.city
+    -> FROM employees e
+    -> JOIN departments d ON e.dept_id = d.dept_id
+    -> JOIN locations l ON d.location_id = l.location_id
+    -> WHERE l.city = 'Delhi';
+```
+
+## 24. From view
+
+```sql
+mysql> SELECT first_name
+    -> FROM emp_view
+    -> WHERE dept_name = 'Finance';
+```
+
+## 25. Update phone through view
+
+```sql
+mysql> UPDATE emp_view
+    -> SET phone_no = '88888888'
+    -> WHERE first_name = 'Rahul';
+```
+
+## 26. Employees with NO dependents using NOT EXISTS
+
+```sql
+mysql> SELECT *
+    -> FROM employees e
+    -> WHERE NOT EXISTS (
+    -> SELECT *
+    -> FROM dependents d
+    -> WHERE d.employee_id = e.employee_id
+    -> );
+```
+
+## 27. Employees whose manager_id is 101 or 201
+
+```sql
+mysql> SELECT *
+    -> FROM employees
+    -> WHERE manager_id = 101
+    -> UNION
+    -> SELECT *
+    -> FROM employees
+    -> WHERE manager_id = 201;
+```
+
+## 28. Employees who have at least one dependent
+
+```sql
+mysql> SELECT *
+    -> FROM employees e
+    -> WHERE EXISTS (
+    -> SELECT *
+    -> FROM dependents d
+    -> WHERE d.employee_id = e.employee_id
+    -> );
+```
+
