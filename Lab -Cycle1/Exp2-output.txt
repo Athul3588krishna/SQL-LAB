@@ -1,0 +1,122 @@
+mysql> CREATE TABLE Persons (
+    -> PersonID INT PRIMARY KEY,
+    -> Name VARCHAR(50) NOT NULL,
+    -> Aadhar BIGINT NOT NULL UNIQUE,
+    -> Age INT CHECK (Age > 18)
+    -> );
+Query OK, 0 rows affected (0.05 sec)
+
+mysql> CREATE TABLE Orders (
+    -> OrderID INT PRIMARY KEY,
+    -> OrderNumber INT NOT NULL,
+    -> PersonID INT,
+    -> FOREIGN KEY (PersonID) REFERENCES Persons(PersonID)
+    -> );
+Query OK, 0 rows affected (0.04 sec)
+
+mysql> DESCRIBE Persons;
++----------+-------------+------+-----+---------+-------+
+| Field    | Type        | Null | Key | Default | Extra |
++----------+-------------+------+-----+---------+-------+
+| PersonID | int         | NO   | PRI | NULL    |       |
+| Name     | varchar(50) | NO   |     | NULL    |       |
+| Aadhar   | bigint      | NO   | UNI | NULL    |       |
+| Age      | int         | YES  |     | NULL    |       |
++----------+-------------+------+-----+---------+-------+
+4 rows in set (0.00 sec)
+
+mysql> DESCRIBE Orders;
++-------------+------+------+-----+---------+-------+
+| Field       | Type | Null | Key | Default | Extra |
++-------------+------+------+-----+---------+-------+
+| OrderID     | int  | NO   | PRI | NULL    |       |
+| OrderNumber | int  | NO   |     | NULL    |       |
+| PersonID    | int  | YES  | MUL | NULL    |       |
++-------------+------+------+-----+---------+-------+
+3 rows in set (0.00 sec)
+
+mysql> CREATE TABLE Department (
+    -> dept_no INT,
+    -> dept_name VARCHAR(50)
+    -> );
+Query OK, 0 rows affected (0.03 sec)
+
+mysql> CREATE TABLE Employee (
+    -> emp_no INT,
+    -> emp_name VARCHAR(50)
+    -> );
+Query OK, 0 rows affected (0.03 sec)
+
+mysql> ALTER TABLE Employee
+    -> ADD PRIMARY KEY (emp_no);
+Query OK, 0 rows affected (0.04 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> DESC Employee;
++----------+-------------+------+-----+---------+-------+
+| Field    | Type        | Null | Key | Default | Extra |
++----------+-------------+------+-----+---------+-------+
+| emp_no   | int         | NO   | PRI | NULL    |       |
+| emp_name | varchar(50) | YES  |     | NULL    |       |
++----------+-------------+------+-----+---------+-------+
+2 rows in set (0.00 sec)
+
+mysql> ALTER TABLE Department
+    -> ADD PRIMARY KEY (dept_no);
+Query OK, 0 rows affected (0.04 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> DESC Department;
++-----------+-------------+------+-----+---------+-------+
+| Field     | Type        | Null | Key | Default | Extra |
++-----------+-------------+------+-----+---------+-------+
+| dept_no   | int         | NO   | PRI | NULL    |       |
+| dept_name | varchar(50) | YES  |     | NULL    |       |
++-----------+-------------+------+-----+---------+-------+
+2 rows in set (0.00 sec)
+
+mysql> ALTER TABLE Employee
+    -> ADD dept_no INT;
+Query OK, 0 rows affected (0.03 sec)
+
+mysql> DESC Employee;
++----------+-------------+------+-----+---------+-------+
+| Field    | Type        | Null | Key | Default | Extra |
++----------+-------------+------+-----+---------+-------+
+| emp_no   | int         | NO   | PRI | NULL    |       |
+| emp_name | varchar(50) | YES  |     | NULL    |       |
+| dept_no  | int         | YES  |     | NULL    |       |
++----------+-------------+------+-----+---------+-------+
+3 rows in set (0.00 sec)
+
+mysql> ALTER TABLE Employee
+    -> ADD FOREIGN KEY (dept_no)
+    -> REFERENCES Department(dept_no)
+    -> ON DELETE CASCADE;
+Query OK, 0 rows affected (0.05 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> DESC Employee;
++----------+-------------+------+-----+---------+-------+
+| Field    | Type        | Null | Key | Default | Extra |
++----------+-------------+------+-----+---------+-------+
+| emp_no   | int         | NO   | PRI | NULL    |       |
+| emp_name | varchar(50) | YES  |     | NULL    |       |
+| dept_no  | int         | YES  | MUL | NULL    |       |
++----------+-------------+------+-----+---------+-------+
+3 rows in set (0.00 sec)
+
+mysql> ALTER TABLE Orders
+    -> DROP PRIMARY KEY;
+Query OK, 0 rows affected (0.04 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> DESC Orders;
++-------------+------+------+-----+---------+-------+
+| Field       | Type | Null | Key | Default | Extra |
++-------------+------+------+-----+---------+-------+
+| OrderID     | int  | NO   | MUL | NULL    |       |
+| OrderNumber | int  | NO   |     | NULL    |       |
+| PersonID    | int  | YES  | MUL | NULL    |       |
++-------------+------+------+-----+---------+-------+
+3 rows in set (0.00 sec)
