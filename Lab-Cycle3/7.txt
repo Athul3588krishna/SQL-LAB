@@ -43,3 +43,120 @@ DELETE FROM employee WHERE emp_id = 1;
 
 
 SELECT * FROM Emp_history;
+
+
+
+
+//8
+CREATE DATABASE company;
+
+USE company;
+
+CREATE TABLE emp_details(
+    EMP_ID INT PRIMARY KEY,
+    FIRST_NAME VARCHAR(30),
+    LAST_NAME VARCHAR(30),
+    JOB_ID VARCHAR(30)
+);
+
+DELIMITER //
+
+CREATE TRIGGER trg_emp_details
+BEFORE INSERT
+ON emp_details
+FOR EACH ROW
+BEGIN
+
+SET NEW.FIRST_NAME = TRIM(NEW.FIRST_NAME);
+
+SET NEW.LAST_NAME = TRIM(NEW.LAST_NAME);
+
+SET NEW.JOB_ID = UPPER(NEW.JOB_ID);
+
+END //
+
+DELIMITER ;
+
+INSERT INTO emp_details
+VALUES
+(1,'   athul   ','   krishna   ','developer');
+
+SELECT * FROM emp_details;
+
+
+
+//9
+
+CREATE DATABASE school;
+
+USE school;
+
+CREATE TABLE student_marks(
+    STUDENT_ID INT PRIMARY KEY,
+    NAME VARCHAR(30),
+    SUB1 INT,
+    SUB2 INT,
+    SUB3 INT,
+    SUB4 INT,
+    SUB5 INT,
+    TOTAL INT,
+    PER_MARKS DECIMAL(5,2),
+    GRADE VARCHAR(30)
+);
+
+INSERT INTO student_marks
+VALUES
+(1,'Steven King',0,0,0,0,0,0,0.00,''),
+(2,'Neena Kochhar',0,0,0,0,0,0,0.00,''),
+(3,'Lex De Haan',0,0,0,0,0,0,0.00,''),
+(4,'Alexander Hunold',0,0,0,0,0,0,0.00,'');
+
+DELIMITER //
+
+CREATE TRIGGER trg_student_marks
+AFTER UPDATE
+ON student_marks
+FOR EACH ROW
+BEGIN
+
+UPDATE student_marks
+SET
+TOTAL = NEW.SUB1 + NEW.SUB2 + NEW.SUB3 + NEW.SUB4 + NEW.SUB5,
+
+PER_MARKS = (NEW.SUB1 + NEW.SUB2 + NEW.SUB3 + NEW.SUB4 + NEW.SUB5)/5,
+
+GRADE =
+CASE
+
+WHEN ((NEW.SUB1 + NEW.SUB2 + NEW.SUB3 + NEW.SUB4 + NEW.SUB5)/5) >= 90
+THEN 'EXCELLENT'
+
+WHEN ((NEW.SUB1 + NEW.SUB2 + NEW.SUB3 + NEW.SUB4 + NEW.SUB5)/5) >= 75
+THEN 'VERY GOOD'
+
+WHEN ((NEW.SUB1 + NEW.SUB2 + NEW.SUB3 + NEW.SUB4 + NEW.SUB5)/5) >= 60
+THEN 'GOOD'
+
+WHEN ((NEW.SUB1 + NEW.SUB2 + NEW.SUB3 + NEW.SUB4 + NEW.SUB5)/5) >= 40
+THEN 'AVERAGE'
+
+ELSE 'NOT PROMOTED'
+
+END
+
+WHERE STUDENT_ID = NEW.STUDENT_ID;
+
+END //
+
+DELIMITER ;
+
+UPDATE student_marks
+SET
+SUB1=95,
+SUB2=90,
+SUB3=85,
+SUB4=80,
+SUB5=75
+WHERE STUDENT_ID=1;
+
+SELECT * FROM student_marks;
